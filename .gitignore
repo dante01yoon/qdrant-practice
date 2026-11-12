@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+.ruff_cache/
+.DS_Store
+qdrant_storage/
+
+# 스크립트로 만드는 큰 데이터(저장소에 넣지 않음)
+data/raw/
+data/esci_us_titles/
+data/abo/
+data/colbert_*.npy
+data/vecs_100k.npy
+data/wix_kb_corpus.jsonl
+data/wixqa_*.jsonl
+data/*.snapshot
+
+# 실행하면 생기는 파일
+checkpoint.json
+query_body.json
+report.json
+*.log
+*.pid
+lessons/**/*.jpg

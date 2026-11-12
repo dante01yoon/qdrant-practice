@@ -1,0 +1,59 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>상품 검색과 고객센터</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #0f1420; color: #e8eefc; margin: 0; padding: 32px 48px; }
+  h1 { font-size: 28px; margin: 0 0 20px; }
+  form { display: flex; gap: 12px; margin-bottom: 24px; }
+  input { font-size: 22px; padding: 10px 14px; border-radius: 10px; border: 1px solid #39465f; background: #182033; color: inherit; }
+  #q { flex: 1; }
+  .small { width: 170px; }
+  button { font-size: 20px; padding: 10px 20px; border-radius: 10px; border: 0; background: #4f8cff; color: white; cursor: pointer; }
+  button.off { background: #182033; }
+  #tabs { margin-bottom: 20px; display: flex; gap: 12px; }
+  .card { background: #182033; border-radius: 12px; padding: 14px 18px; margin-bottom: 12px; font-size: 18px; }
+  .card a { color: #8fb8ff; font-weight: 600; text-decoration: none; }
+  .meta { color: #8fe3a0; font-size: 15px; margin-top: 6px; }
+  .text { margin-top: 8px; font-size: 16px; color: #c4cfe6; white-space: pre-wrap; max-height: 170px; overflow: hidden; }
+  .warn { background: #3a2a12; color: #ffd27a; }
+</style>
+
+<h1>상품 검색과 고객센터</h1>
+<div id="tabs"><button id="t1">상품 찾기</button><button id="t2" class="off">고객센터에 묻기</button></div>
+<form id="f">
+  <input id="q" placeholder="찾을 상품">
+  <input id="brand" class="small" placeholder="브랜드">
+  <input id="color" class="small" placeholder="색상">
+  <button id="go">찾기</button>
+</form>
+<div id="out"></div>
+
+<script>
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  let mode = "shop";
+  function pick(m) {
+    mode = m;
+    t1.className = m === "shop" ? "" : "off";
+    t2.className = m === "help" ? "" : "off";
+    brand.style.display = color.style.display = m === "shop" ? "" : "none";
+    q.placeholder = m === "shop" ? "찾을 상품" : "궁금한 점";
+    out.innerHTML = "";
+  }
+  t1.onclick = () => pick("shop");
+  t2.onclick = () => pick("help");
+
+  const product = (p) => `<div class="card"><a href="${esc(p.url)}">${esc(p.title)}</a><div class="meta">${esc(p.brand)} · ${esc(p.color)}</div></div>`;
+  const article = (a) => `<div class="card"><a href="${esc(a.url)}">${esc(a.title)}</a><div class="meta">점수 ${a.score}</div><div class="text">${esc(a.text)}</div></div>`;
+
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    if (mode === "shop") {
+      const res = await fetch(`/search?q=${encodeURIComponent(q.value)}&brand=${encodeURIComponent(brand.value)}&color=${encodeURIComponent(color.value)}`);
+      out.innerHTML = (await res.json()).map(product).join("");
+    } else {
+      const r = await (await fetch(`/ask?q=${encodeURIComponent(q.value)}`)).json();
+      out.innerHTML = r.sure ? r.found.slice(0, 3).map(article).join("") : `<div class="card warn">확실한 글을 찾지 못했어요. 담당자에게 연결할게요.</div>`;
+    }
+  };
+</script>

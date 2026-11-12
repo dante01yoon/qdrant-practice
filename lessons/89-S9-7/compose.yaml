@@ -1,0 +1,19 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.20.0
+    ports: ["127.0.0.1:6340:6333", "127.0.0.1:6341:6334"]
+    volumes: ["qdrant_data:/qdrant/storage"]
+    mem_limit: 2g
+    restart: unless-stopped
+  app:
+    build: .
+    ports: ["127.0.0.1:8090:8000"]
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      HF_HUB_OFFLINE: "1"
+    volumes: ["${HOME}/.cache/huggingface:/root/.cache/huggingface:ro"]
+    depends_on: [qdrant]
+    mem_limit: 4g
+    restart: unless-stopped
+volumes:
+  qdrant_data:

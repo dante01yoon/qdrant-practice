@@ -1,0 +1,27 @@
+services:
+  node1:
+    image: qdrant/qdrant:v1.20.0
+    container_name: qd-node1
+    environment:
+      QDRANT__CLUSTER__ENABLED: "true"
+    command: ./qdrant --uri http://node1:6335
+    ports: ["6401:6333"]
+    mem_limit: 1g
+  node2:
+    image: qdrant/qdrant:v1.20.0
+    container_name: qd-node2
+    environment:
+      QDRANT__CLUSTER__ENABLED: "true"
+    command: ./qdrant --bootstrap http://node1:6335
+    depends_on: [node1]
+    ports: ["6402:6333"]
+    mem_limit: 1g
+  node3:
+    image: qdrant/qdrant:v1.20.0
+    container_name: qd-node3
+    environment:
+      QDRANT__CLUSTER__ENABLED: "true"
+    command: ./qdrant --bootstrap http://node1:6335
+    depends_on: [node1]
+    ports: ["6403:6333"]
+    mem_limit: 1g

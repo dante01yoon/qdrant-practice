@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>상품 사진 검색</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #0f1420; color: #e8eefc; margin: 0; padding: 32px 48px; }
+  h1 { font-size: 28px; margin: 0 0 20px; }
+  form { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; }
+  input[type=text] { font-size: 22px; padding: 10px 14px; width: 420px; border-radius: 10px; border: 1px solid #39465f; background: #182033; color: inherit; }
+  label { font-size: 20px; padding: 8px 14px; border-radius: 10px; background: #182033; cursor: pointer; }
+  button { font-size: 20px; padding: 10px 20px; border-radius: 10px; border: 0; background: #4f8cff; color: white; cursor: pointer; }
+  #grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { background: #182033; border-radius: 12px; padding: 12px; }
+  .card img { width: 100%; height: 180px; object-fit: contain; background: white; border-radius: 8px; }
+  .type { color: #8fe3a0; font-size: 15px; margin-top: 8px; }
+  .name { font-size: 15px; margin-top: 4px; height: 38px; overflow: hidden; }
+  footer { margin-top: 20px; color: #8a97b3; font-size: 14px; }
+</style>
+<h1>상품 사진 검색</h1>
+<form id="f">
+  <input type="text" id="q" placeholder="찾을 상품">
+  <label><input type="radio" name="way" value="photo" checked> 사진만</label>
+  <label><input type="radio" name="way" value="name"> 이름만</label>
+  <label><input type="radio" name="way" value="mix"> 섞기</label>
+  <button>검색</button>
+</form>
+<div style="display: flex; gap: 12px; margin-bottom: 24px"><label><input type="radio" name="only" value="" checked> 모든 종류</label><label><input type="radio" name="only" value="SHOES"> 신발</label><label><input type="radio" name="only" value="CHAIR"> 의자</label><label><input type="radio" name="only" value="COFFEE"> 커피</label></div>
+<div id="grid"></div>
+<footer>사진 · Amazon Berkeley Objects (CC BY 4.0)</footer>
+<script>
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  document.getElementById("f").onsubmit = async (e) => {
+    e.preventDefault();
+    const way = document.querySelector("input[name=way]:checked").value;
+    const only = document.querySelector("input[name=only]:checked").value;
+    const res = await fetch(`/search?q=${encodeURIComponent(q.value)}&way=${way}&only=${only}`);
+    grid.innerHTML = (await res.json()).map((p) =>
+      `<div class="card"><img src="/small/${p.image_id}.jpg"><div class="type">${esc(p.type)}</div><div class="name">${esc(p.name)}</div></div>`).join("");
+  };
+</script>
